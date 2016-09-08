@@ -18,7 +18,12 @@ import java.util.UUID;
 public class Author extends Person implements Serializable {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private final List<Book> booksAuthored;
+    private List<Book> booksAuthored;
+
+    public Author() {
+        super();
+        booksAuthored = new ArrayList<>();
+    }
 
     public Author(UUID id, String name, String surname) {
         super(id, name, surname);

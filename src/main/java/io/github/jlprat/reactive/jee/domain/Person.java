@@ -14,10 +14,13 @@ import java.util.UUID;
 public class Person implements Serializable {
 
     @Id
-    protected final String id;
-    protected final String name;
-    protected final String surname;
+    protected String id;
+    protected String name;
+    protected String surname;
 
+
+    public Person() {
+    }
 
     public Person(UUID id, String name, String surname) {
         this.id = id.toString();

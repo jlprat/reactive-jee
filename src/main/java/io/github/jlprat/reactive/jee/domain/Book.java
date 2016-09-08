@@ -13,11 +13,14 @@ import java.io.Serializable;
 public class Book implements Serializable {
 
     @Id
-    private final String isbn;
-    private final String title;
-    private final String authorName;
-    private final int pages;
+    private String isbn;
+    private String title;
+    private String authorName;
+    private int pages;
 
+
+    public Book() {
+    }
 
     public Book(String isbn, String title, String authorName, int pages) {
         this.isbn = isbn;

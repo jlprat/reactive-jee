@@ -18,7 +18,12 @@ import java.util.UUID;
 public class Reader extends Person implements Serializable {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private final List<Book> bookShelf;
+    private List<Book> bookShelf;
+
+    public Reader() {
+        super();
+        bookShelf = new ArrayList<>();
+    }
 
     public Reader(UUID id, String name, String surname) {
         super(id, name, surname);

@@ -25,9 +25,10 @@
 		<div class="reveal">
 			<div class="slides">
 				<section>
-				    <h2>Improving Your JEE Monolith with Reactive Techniques</h2>
+				    <h2>Reactive JEE</h2>
+				    <h3>Improving Your JEE Monolith with Reactive Techniques</h3>
 				    <small>
-				        Josep Prat <a href="https://twitter.com/jlprat">@jlprat</a> - <a href="https://twitter.com/hashtag/reactivejee">#reactiveJEE</a> - Berlin Expert Days - 16/09/2016
+				        Josep Prat - <a target="_blank" href="https://twitter.com/jlprat">@jlprat</a> - <a target="_blank" href="https://twitter.com/hashtag/reactivejee">#reactiveJEE</a> - Berlin Expert Days - 16/09/2016
 				    </small>
 				</section>
 			</div>
