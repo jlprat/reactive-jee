@@ -1,6 +1,10 @@
 # reactive-jee
 Code and Slides for "Improving Your JEE Monolith with Reactive Techniques" talk
 
+## Link to slides
+[https://jlprat.github.io/reactive-jee](https://jlprat.github.io/reactive-jee)
+
+
 ## To Start
 * asadmin start-database
 * mvn package
