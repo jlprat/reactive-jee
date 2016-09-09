@@ -4,6 +4,7 @@ import io.github.jlprat.reactive.jee.domain.Author;
 import io.github.jlprat.reactive.jee.domain.Book;
 import io.github.jlprat.reactive.jee.service.AuthorService;
 import io.github.jlprat.reactive.jee.service.BookService;
+import io.github.jlprat.reactive.jee.service.LendingService;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -26,7 +27,11 @@ public class BookWs {
     @Inject
     private AuthorService authorService;
 
+    @Inject
+    private LendingService lendingService;
+
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getBooks() {
         return Response.ok(bookService.getBooks()).build();
     }
@@ -52,6 +57,7 @@ public class BookWs {
         final Author author = authorService.getAuthor(authorId);
         if (author != null) {
             final Book book = bookService.writeBook(author, title, pages);
+            lendingService.publishBook(book);
             return Response.ok(book).build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST).entity("No author with this id").build();
