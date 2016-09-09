@@ -22,6 +22,12 @@ public class Author extends Person implements Serializable {
     public static final String ALL_AUTHORS = "allAuthors";
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable
+            (
+                    name="BOOKS_AUTHORED",
+                    joinColumns={ @JoinColumn(name="AUTHOR_ID", referencedColumnName="ID") },
+                    inverseJoinColumns={ @JoinColumn(name="BOOK_ID", referencedColumnName="ISBN", unique=true) }
+            )
     private List<Book> booksAuthored;
 
     public Author() {

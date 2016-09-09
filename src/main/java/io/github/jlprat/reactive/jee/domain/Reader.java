@@ -23,6 +23,12 @@ public class Reader extends Person implements Serializable {
 
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable
+            (
+                    name="BOOK_SHELF",
+                    joinColumns={ @JoinColumn(name="READER_ID", referencedColumnName="ID") },
+                    inverseJoinColumns={ @JoinColumn(name="BOOK_ID", referencedColumnName="ISBN", unique=true) }
+            )
     private List<Book> bookShelf;
 
     public Reader() {
