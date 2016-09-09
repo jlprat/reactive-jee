@@ -1,21 +1,25 @@
 package io.github.jlprat.reactive.jee.domain;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static io.github.jlprat.reactive.jee.domain.Author.ALL_AUTHORS;
+
 /**
  * @author @jlprat
  */
 @Entity
 @XmlRootElement
+@NamedQueries({
+        @NamedQuery(name=ALL_AUTHORS, query="select a from Author a")
+})
 public class Author extends Person implements Serializable {
+
+    public static final String ALL_AUTHORS = "allAuthors";
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Book> booksAuthored;

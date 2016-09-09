@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author @jlprat
@@ -14,7 +15,20 @@ import java.util.List;
 @Stateless
 public class AuthorService {
 
+    @PersistenceContext
+    private EntityManager em;
+
     public List<Author> getAuthors() {
-        return new ArrayList<>();
+        return em.createNamedQuery(Author.ALL_AUTHORS, Author.class).getResultList();
+    }
+
+    public Author createAuthor(final String name, final String surname) {
+        final Author author = new Author(UUID.randomUUID(), name, surname);
+        em.persist(author);
+        return author;
+    }
+
+    public Author getAuthor(final String id) {
+        return em.find(Author.class, id);
     }
 }

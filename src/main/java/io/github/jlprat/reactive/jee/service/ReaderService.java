@@ -19,12 +19,16 @@ public class ReaderService {
     private EntityManager em;
 
     public List<Reader> getReaders() {
-        return new ArrayList<>();
+        return em.createNamedQuery(Reader.ALL_READERS, Reader.class).getResultList();
     }
 
     public Reader createReader(final String name, final String surname) {
         final Reader reader = new Reader(UUID.randomUUID(), name, surname);
         em.persist(reader);
         return reader;
+    }
+
+    public Reader getReader(final String id) {
+        return em.find(Reader.class, id);
     }
 }

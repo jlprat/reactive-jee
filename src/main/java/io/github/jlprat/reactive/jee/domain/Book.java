@@ -2,15 +2,24 @@ package io.github.jlprat.reactive.jee.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+
+import static io.github.jlprat.reactive.jee.domain.Book.ALL_BOOKS;
 
 /**
  * @author @jlprat
  */
 @XmlRootElement
 @Entity
+@NamedQueries({
+    @NamedQuery(name=ALL_BOOKS, query = "select b from Book b")
+})
 public class Book implements Serializable {
+
+    public static final String ALL_BOOKS = "allBooks";
 
     @Id
     private String isbn;
