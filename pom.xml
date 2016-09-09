@@ -28,12 +28,12 @@
             <version>2.7.4</version>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>fish.payara.extras</groupId>-->
-            <!--<artifactId>payara-embedded-all</artifactId>-->
-            <!--<version>4.1.152.1</version>-->
-            <!--<type>jar</type>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.glassfish.main.extras</groupId>
+            <artifactId>glassfish-embedded-all</artifactId>
+            <version>4.1.1</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 

@@ -1,14 +1,13 @@
 package io.github.jlprat.reactive.jee.rest;
 
+import io.github.jlprat.reactive.jee.domain.Author;
 import io.github.jlprat.reactive.jee.domain.Book;
+import io.github.jlprat.reactive.jee.service.AuthorService;
 import io.github.jlprat.reactive.jee.service.BookService;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -23,6 +22,9 @@ public class BookWs {
 
     @Inject
     private BookService bookService;
+
+    @Inject
+    private AuthorService authorService;
 
     @GET
     public Response getBooks() {
@@ -40,4 +42,20 @@ public class BookWs {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
+
+
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response writeBook(@FormParam("author") final String authorId, @FormParam("title") final String title,
+                              @FormParam("pages") final int pages) {
+        final Author author = authorService.getAuthor(authorId);
+        if (author != null) {
+            final Book book = bookService.writeBook(author, title, pages);
+            return Response.ok(book).build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST).entity("No author with this id").build();
+        }
+    }
+
 }

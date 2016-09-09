@@ -30,8 +30,12 @@ public class ReaderWs {
     @Path("/{id}")
     @GET
     public Response getReader(@PathParam("id") final String id) {
-        final Reader reader = new Reader(UUID.randomUUID(), "John", "Doe");
-        return Response.ok(reader).build();
+        final Reader reader = readerService.getReader(id);
+        if (reader != null) {
+            return Response.ok(reader).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
     }
 
     @POST
