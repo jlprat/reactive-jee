@@ -9,13 +9,15 @@ import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
- * @author jpra
- *         copyright (c) 2003-2016 GameDuell GmbH, All Rights Reserved
+ * @author @jlprat
  */
 @Stateless
 public class BookService {
+
+    private Logger logger = Logger.getLogger(BookService.class.getName());
 
     @PersistenceContext
     private EntityManager em;
@@ -31,6 +33,9 @@ public class BookService {
     public Book writeBook(final Author author, final String title, final int pages) {
         final Book book = new Book(UUID.randomUUID().toString(), title, author.getName(), pages);
         em.persist(book);
+        logger.info("book persisted, adding to author list");
+        author.writtenBook(book);
+        em.merge(author);
         return book;
     }
 }
