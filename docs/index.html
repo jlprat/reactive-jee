@@ -96,16 +96,91 @@
         </section>
         <section>
             <h2>Asynchronicity</h2>
+            <img src="images/yarn-671956_1280.jpg" alt="threads" width="60%">
+        </section>
+        <section>
+            <h3>Free the Threads</h3>
             <p>Database calls and remote server calls are typically synchronous. This means that every time one of those methods is called it takes some time to return, with a thread left waiting for the answer. Why not model it accordingly?</p>
         </section>
         <section>
-            <h3>Asynchronous Session Beans</h3>
+            <h3>Asynchronous Servlet</h3>
+            <p>How a normal one looks like</p>
+            <pre><code>@WebServlet(urlPatterns = "/servlet/users")
+public class UserServlet extends HttpServlet {
+    ...
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        final List&lt;Author&gt; authors = authorService.getAuthors();
+        final List&lt;Reader&gt; readers = readerService.getReaders();
+        final List&lt;Person&gt; users = new ArrayList<>(authors.size() + readers.size());
+        users.addAll(authors);
+        users.addAll(readers);
+        final ServletOutputStream out = resp.getOutputStream();
+        for (Person user : users) {
+            out.println(user.toString());
+        }
+    }
+}</code></pre>
         </section>
         <section>
             <h3>Asynchronous Servlet</h3>
+            <p>Making it asynchronous</p>
+            <pre><code>@WebServlet(urlPatterns = "/servlet/users", asyncSuppported = true)
+public class UserServlet extends HttpServlet {
+    ...
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        final AsyncContext asyncCtx = req.startAsync();
+        asyncCtx.start(() -> {
+            final List&lt;Author&gt; authors = authorService.getAuthors();
+            final List&lt;Reader&gt; readers = readerService.getReaders();
+            final List&lt;Person&gt; users = mergeUsers(authors, readers);
+            printUsers(users, asyncCtx.getResponse().getOutputStream());
+            asyncCtx.complete();
+        });
+    }
+}</code></pre>
+        </section>
+        <section>
+            <h3>But who writes Servlets nowadays?</h3>
         </section>
         <section>
             <h3>Asynchronous JAX-RS</h3>
+            <p>How a normal one looks like</p>
+            <pre><code>@Path("/users")
+public class UserWs {
+    ...
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUsers() {
+        final List&lt;Author&gt; authors = authorService.getAuthors();
+        final List&lt;Reader&gt; readers = readerService.getReaders();
+        final List&lt;Person&gt; users = mergeUsers(authors, readers);
+        return Response.ok(users).build();
+    }
+}</code></pre>
+        </section>
+        <section>
+            <h3>Asynchronous JAX-RS</h3>
+            <p>Making it asynchronous</p>
+            <pre><code>@Path("/users")
+public class UserWs {
+    ...
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Asynchronous
+    public void getUsers(@Suspended AsyncResponse response) {
+        final List&lt;Author&gt; authors = authorService.getAuthors();
+        final List&lt;Reader&gt; readers = readerService.getReaders();
+        final List&lt;Person&gt; users = mergeUsers(authors, readers);
+        response.resume(Response.ok(users).build());
+    }
+}</code></pre>
+        </section>
+
+
+        <section>
+            <h3>Asynchronous Session Beans</h3>
         </section>
         <section>
             <h3>Future vs CompletableFuture</h3>
