@@ -7,6 +7,7 @@ import io.github.jlprat.reactive.jee.service.AuthorService;
 import io.github.jlprat.reactive.jee.service.ReaderService;
 
 import javax.inject.Inject;
+import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
@@ -20,7 +21,7 @@ import java.util.List;
 /**
  * @author @jlprat
  */
-@WebServlet(urlPatterns = "/servlet/users")
+@WebServlet(urlPatterns = "/servlet/users", asyncSupported = true)
 public class UserServlet extends HttpServlet {
 
     @Inject
@@ -31,14 +32,22 @@ public class UserServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        final List<Author> authors = authorService.getAuthors();
-        final List<Reader> readers = readerService.getReaders();
-        final List<Person> users = new ArrayList<>(authors.size() + readers.size());
-        users.addAll(authors);
-        users.addAll(readers);
-        final ServletOutputStream outputStream = resp.getOutputStream();
-        for (Person user : users) {
-            outputStream.println(user.toString());
-        }
+        final AsyncContext asyncContext = req.startAsync();
+        asyncContext.start(() -> {
+            try {
+                final List<Author> authors = authorService.getAuthors();
+                final List<Reader> readers = readerService.getReaders();
+                final List<Person> users = new ArrayList<>(authors.size() + readers.size());
+                users.addAll(authors);
+                users.addAll(readers);
+                final ServletOutputStream out = asyncContext.getResponse().getOutputStream();
+                for (Person user : users) {
+                    out.println(user.toString());
+                }
+                asyncContext.complete();
+            } catch (IOException e) {
+                throw new IllegalStateException("Problem with IO", e);
+            }
+        });
     }
 }
