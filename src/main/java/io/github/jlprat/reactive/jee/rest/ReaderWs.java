@@ -3,12 +3,16 @@ package io.github.jlprat.reactive.jee.rest;
 import io.github.jlprat.reactive.jee.domain.Reader;
 import io.github.jlprat.reactive.jee.service.ReaderService;
 
+import javax.ejb.Asynchronous;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.*;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.UUID;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
 /**
@@ -25,9 +29,11 @@ public class ReaderWs {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getReaders() {
-        logger.info("Processing request " + Thread.currentThread().getName());
-        return Response.ok(readerService.getReaders()).build();
+    @Asynchronous
+    public void getAuthors(@Suspended AsyncResponse response) {
+        CompletableFuture<List<Reader>> promise = new CompletableFuture<>();
+        readerService.getReaders(promise);
+        promise.thenApply(response::resume);
     }
 
     @Path("/{id}")

@@ -18,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -48,11 +49,15 @@ public class UserWs {
             logger.info("resuming request " + Thread.currentThread().getName());
             resp.resume(Response.status(Response.Status.REQUEST_TIMEOUT).build());
         });
-        final List<Author> authors = authorService.getAuthors();
-        final List<Reader> readers = readerService.getReaders();
-        final List<Person> users = new ArrayList<>(authors.size() + readers.size());
-        users.addAll(authors);
-        users.addAll(readers);
-        response.resume(Response.ok(users).build());
+        final CompletableFuture<List<Author>> authors = new CompletableFuture<>();
+        final CompletableFuture<List<Reader>> readers = new CompletableFuture<>();
+        authorService.getAuthors(authors);
+        readerService.getReaders(readers);
+        authors.thenCombine(readers, (a, r) -> {
+            final List<Person> list = new ArrayList<>(a.size() + r.size());
+            list.addAll(a);
+            list.addAll(r);
+            return list;
+        }).thenApply(response::resume);
     }
 }

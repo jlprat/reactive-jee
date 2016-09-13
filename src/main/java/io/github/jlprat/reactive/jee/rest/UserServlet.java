@@ -35,8 +35,8 @@ public class UserServlet extends HttpServlet {
         final AsyncContext asyncContext = req.startAsync();
         asyncContext.start(() -> {
             try {
-                final List<Author> authors = authorService.getAuthors();
-                final List<Reader> readers = readerService.getReaders();
+                final List<Author> authors = authorService.getAuthorsSync();
+                final List<Reader> readers = readerService.getReadersSync();
                 final List<Person> users = new ArrayList<>(authors.size() + readers.size());
                 users.addAll(authors);
                 users.addAll(readers);

@@ -11,8 +11,8 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.concurrent.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -29,12 +29,17 @@ public class AuthorWs {
     private AuthorService authorService;
 
     @GET
-    public Response getAuthors() {
-        return Response.ok(authorService.getAuthors()).build();
+    @Produces(MediaType.APPLICATION_JSON)
+    @Asynchronous
+    public void getAuthors(@Suspended AsyncResponse response) {
+        CompletableFuture<List<Author>> promise = new CompletableFuture<>();
+        authorService.getAuthors(promise);
+        promise.thenApply(response::resume);
     }
 
     @Path("/{id}")
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getAuthor(@PathParam("id") final String id) {
         final Author author = authorService.getAuthor(id);
         if (author != null) {
