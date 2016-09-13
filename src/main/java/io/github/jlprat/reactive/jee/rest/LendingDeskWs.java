@@ -15,8 +15,7 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 
 /**
- * @author jpra
- *         copyright (c) 2003-2016 GameDuell GmbH, All Rights Reserved
+ * @author @jlprat
  */
 @Stateless
 @Path("/lending")
