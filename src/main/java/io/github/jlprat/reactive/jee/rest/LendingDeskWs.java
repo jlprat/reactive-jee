@@ -13,6 +13,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author @jpra
@@ -33,16 +34,17 @@ public class LendingDeskWs {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response lendBook(@FormParam("isbn") final String isbn, @FormParam("readerId") final String readerId) {
-        final Book book = bookService.getBook(isbn);
-        if (book == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("No book with this isbn").build();
-        }
-        final Reader reader = readerService.getReader(readerId);
-        if (reader == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("No reader with this id").build();
-        }
-        lendingService.lendBook(book, reader);
-        return Response.ok(book).build();
+        final Optional<Book> maybeBook = bookService.getBook(isbn);
+        final Optional<Reader> maybeReader = readerService.getReader(readerId);
+        return maybeBook
+                .map(book -> maybeReader
+                        .map(r -> {
+                            lendingService.lendBook(book, r);
+                            return Response.ok(book);
+                        })
+                        .orElseGet(() -> Response.status(Response.Status.BAD_REQUEST).entity("No reader with this id")))
+                .orElseGet(() -> Response.status(Response.Status.BAD_REQUEST).entity("No book with this isbn"))
+                .build();
     }
 
     @POST
@@ -50,16 +52,17 @@ public class LendingDeskWs {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response returnBook(@FormParam("isbn") final String isbn, @FormParam("readerId") final String readerId) {
-        final Book book = bookService.getBook(isbn);
-        if (book == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("No book with this isbn").build();
-        }
-        final Reader reader = readerService.getReader(readerId);
-        if (reader == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("No reader with this id").build();
-        }
-        lendingService.returnBook(book, reader);
-        return Response.ok(book).build();
+        final Optional<Book> maybeBook = bookService.getBook(isbn);
+        final Optional<Reader> maybeReader = readerService.getReader(readerId);
+        return maybeBook
+                .map(book -> maybeReader
+                        .map(r -> {
+                            lendingService.returnBook(book, r);
+                            return Response.ok(book);
+                        })
+                        .orElseGet(() -> Response.status(Response.Status.BAD_REQUEST).entity("No reader with this id")))
+                .orElseGet(() -> Response.status(Response.Status.BAD_REQUEST).entity("No book with this isbn"))
+                .build();
     }
 
     @GET

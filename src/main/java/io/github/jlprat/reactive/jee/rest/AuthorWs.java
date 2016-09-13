@@ -12,6 +12,7 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
 
@@ -41,12 +42,11 @@ public class AuthorWs {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAuthor(@PathParam("id") final String id) {
-        final Author author = authorService.getAuthor(id);
-        if (author != null) {
-            return Response.ok(author).build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
+        final Optional<Author> author = authorService.getAuthor(id);
+        return author
+                .map(Response::ok)
+                .orElseGet(() -> Response.status(Response.Status.NOT_FOUND))
+                .build();
     }
 
     @POST

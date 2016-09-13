@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -35,7 +36,10 @@ public class ReaderService {
         return reader;
     }
 
-    public Reader getReader(final String id) {
-        return em.find(Reader.class, id);
+    /**
+     * WARNING!!! optional is not Serializable, it can't be part of any remote session bean!
+     */
+    public Optional<Reader> getReader(final String id) {
+        return Optional.ofNullable(em.find(Reader.class, id));
     }
 }

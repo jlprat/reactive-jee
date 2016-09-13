@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -26,8 +27,8 @@ public class BookService {
         return em.createNamedQuery(Book.ALL_BOOKS, Book.class).getResultList();
     }
 
-    public Book getBook(final String isbn) {
-        return em.find(Book.class, isbn);
+    public Optional<Book> getBook(final String isbn) {
+        return Optional.ofNullable(em.find(Book.class, isbn));
     }
 
     public Book writeBook(final Author author, final String title, final int pages) {

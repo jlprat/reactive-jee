@@ -7,6 +7,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -35,7 +36,7 @@ public class AuthorService {
         promise.complete(author);
     }
 
-    public Author getAuthor(final String id) {
-        return em.find(Author.class, id);
+    public Optional<Author> getAuthor(final String id) {
+        return Optional.ofNullable(em.find(Author.class, id));
     }
 }

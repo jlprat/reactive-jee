@@ -12,6 +12,7 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
@@ -38,13 +39,13 @@ public class ReaderWs {
 
     @Path("/{id}")
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getReader(@PathParam("id") final String id) {
-        final Reader reader = readerService.getReader(id);
-        if (reader != null) {
-            return Response.ok(reader).build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
+        final Optional<Reader> reader = readerService.getReader(id);
+        return reader
+                .map(Response::ok)
+                .orElseGet(() -> Response.status(Response.Status.NOT_FOUND))
+                .build();
     }
 
     @POST
