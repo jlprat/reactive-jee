@@ -92,14 +92,14 @@
         </section>
         <section>
             <h2>3 main areas</h2>
-            <ul>
+            <ol>
                 <li class="fragment">Asynchronicity</li>
-                <li class="fragment">Embrace failure</li>
+                <li class="fragment">Things fail</li>
                 <li class="fragment">Event based</li>
-            </ul>
+            </ol>
         </section>
         <section>
-            <h2>Asynchronicity</h2>
+            <h2>1. Asynchronicity</h2>
             <img src="images/yarn-671956_1280.jpg" alt="threads" width="60%">
         </section>
         <section>
@@ -167,7 +167,8 @@ public class UserWs {
         <section>
             <h3>Asynchronous JAX-RS</h3>
             <p>Making it asynchronous</p>
-            <pre><code>@Path("/users")
+            <pre><code>@Stateless
+@Path("/users")
 public class UserWs {
     ...
     @GET
@@ -184,7 +185,8 @@ public class UserWs {
         <section>
             <h3>Asynchronous JAX-RS</h3>
             <p>Never wait forever!</p>
-            <pre><code>@Path("/users")
+            <pre><code>@Stateless
+@Path("/users")
 public class UserWs {
     ...
     @GET
@@ -210,7 +212,7 @@ public class UserWs {
             <p>Last thing you want is waiting forever to complete a request from a client. Always specify timeouts when doing asynchronous tasks.</p>
         </section>
         <section>
-            <h3>Asynchronous Servlet and JAX-RS</h3>
+            <h3>Asynchronous Servlet & JAX-RS</h3>
             <p>Use them when you have a combination of heavy and light loaded queries. You can get a higher throughput and your server can be better fine-tuned.</p>
         </section>
         <section>
@@ -301,17 +303,19 @@ public class AuthorWs {
 public class AuthorService {
     @Asynchronous
     public void createAuthor(final String name, final String surname,
-                final CompletableFuture&lt;Author&gt; future) {
+                final CompletableFuture&lt;Author&gt; promise) {
         final Author author = new Author(UUID.randomUUID(), name, surname);
         em.persist(author);
-        future.complete(author);
+        promise.complete(author);
     }
 }</code></pre>
         </section>
         <section>
-            <h3>Asynchronous Session Beans</h3>
-            <p>The Client (III)</p>
-            <pre><code>@Path("/users/authors")
+            <section>
+                <h3>Asynchronous Session Beans</h3>
+                <p>The Client (III)</p>
+                <pre><code>@Stateless
+@Path("/users/authors")
 public class AuthorWs {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -324,23 +328,49 @@ public class AuthorWs {
         futureAuthor.thenApply(response::resume);
     }
 }</code></pre>
+            </section>
+            <section>
+                <h3>Asynchronous Session Beans</h3>
+                <p>The Client (III bis)</p>
+                <pre><code>@GET
+@Produces(MediaType.APPLICATION_JSON)
+@Asynchronous
+public void getUsers(@Suspended AsyncResponse response) {
+    final CompletableFuture&lt;List&lt;Author&gt;&gt; authors = new CompletableFuture&lt;&gt;();
+    final CompletableFuture&lt;List&lt;Reader&gt;&gt; readers = new CompletableFuture&lt;&gt;();
+    authorService.getAuthors(authors);
+    readerService.getReaders(readers);
+    authors.thenCombine(readers, (a, r) -&gt; {
+        final List&lt;Person&gt; list = new ArrayList&lt;&gt;(a.size() + r.size());
+        list.addAll(a);
+        list.addAll(r);
+        return list;
+    }).thenApply(response::resume);
+}</code></pre>
+            </section>
+        </section>
+        <section>
+            <h3>Behind the Scenes</h3>
+            <p>Any time an asynchronous method is invoked, this is served by another thread-pool, freeing the caller one to continue with their tasks.</p>
+        </section>
+        <section>
+            <h3>Asynchronous Session Beans</h3>
+            <p>Use them when you can benefit of calling different Session Beans at the same time. Throughput can be incremented this way.</p>
         </section>
         <section>
             <h3>Future vs CompletableFuture</h3>
-
+            <p>Futures are currently the main actor for Asynchronicity in JEE. However, they have some limitations as they can't compose and make use of the new lambdas.</p>
         </section>
         <section>
-            <h2>Embrace failure and errors</h2>
+            <h2>2. Things fail</h2>
             <p>Model failure in your API's if things can go wrong. In the same way, don't expect users of your methods checking if your returned object is null.</p>
         </section>
         <section>
             <h3>Optional</h3>
+            <p>Introduced in Java 8</p>
         </section>
         <section>
             <h3>Try - Computations that might fail</h3>
-        </section>
-        <section>
-            <h3>Don't wait infinitely</h3>
         </section>
         <section>
             <h2>Event Based</h2>
