@@ -104,7 +104,7 @@
         </section>
         <section>
             <h3>Free the Threads</h3>
-            <p>Database calls and remote server calls are typically synchronous. This means that every time one of those methods is called it takes some time to return, with a thread left waiting for the answer. Why not model it accordingly?</p>
+            <p>Database and remote server calls are typically synchronous. This means that every time one of those methods is called it takes some time to return, with a thread left waiting for the answer. Why not model it accordingly?</p>
         </section>
         <section>
             <h3>Asynchronous Servlet</h3>
@@ -205,7 +205,7 @@ public class UserWs {
         </section>
         <section>
             <h3>Behind the Scenes</h3>
-            <p>Request is accepted by a thread belonging to the http-thread-pool but the processing it's handled by a thread from the ejb-thread-pool. This way, the http-thread is free to accept new incoming request.</p>
+            <p>Request is accepted by a thread belonging to the http-thread-pool but the processing it is handled by a thread from the ejb-thread-pool. This way, the http-thread is free to accept new incoming request.</p>
         </section>
         <section>
             <h3>Behind the Scenes</h3>
@@ -292,7 +292,6 @@ public class AuthorWs {
 }</code></pre>
         </section>
         <section>
-            <h3>Asynchronous Session Beans</h3>
             <h3>This does not work!</h3>
             <blockquote>Async method exposed through no-interface view must  have return type void or java.lang.concurrent.Future&lt;V&gt;</blockquote>
         </section>
@@ -351,7 +350,7 @@ public void getUsers(@Suspended AsyncResponse response) {
         </section>
         <section>
             <h3>Behind the Scenes</h3>
-            <p>Any time an asynchronous method is invoked, this is served by another thread-pool, freeing the caller one to continue with their tasks.</p>
+            <p>Any time an asynchronous method is invoked, it is served by another thread-pool, freeing the caller one to continue with their tasks.</p>
         </section>
         <section>
             <h3>Asynchronous Session Beans</h3>
@@ -359,7 +358,7 @@ public void getUsers(@Suspended AsyncResponse response) {
         </section>
         <section>
             <h3>Future vs CompletableFuture</h3>
-            <p>Futures are currently the main actor for Asynchronicity in JEE. However, they have some limitations as they can't compose and make use of the new lambdas.</p>
+            <p>Futures are currently the main actor for Asynchronicity in JEE. However, they have some limitations as they can not compose and make use of the new lambdas like CompletableFuture does.</p>
         </section>
         <section>
             <h2>2. Things fail</h2>
@@ -367,14 +366,15 @@ public void getUsers(@Suspended AsyncResponse response) {
         </section>
         <section>
             <h2>Model failure</h2>
-            <p>Model failure in your API's if things can go wrong. In the same way, don't expect users of your methods checking if your returned object is null.</p>
+            <p>If things can go wrong, model failure in your API's. In the same way, do not expect users of your methods to check if your returned object is null.</p>
         </section>
         <section>
             <h3>Optional</h3>
-            <p>Introduced in Java 8 it's mean only to express that a method whose return value might be not exist. It's not intended to be used in fields.</p>
+            <p>Introduced in Java 8, its only purpose is to express that the return value of a method might not exist. It is not intended to be used in fields.</p>
         </section>
         <section>
-            <h3>Optional Example</h3>
+            <h3>Optional</h3>
+            <p>Example code</p>
             <pre><code>@Stateless
 public class ReaderService {
     public Optional&lt;Reader&gt; getReader(final String id) {
@@ -394,15 +394,16 @@ public class ReaderWs {
 }</code></pre>
         </section>
         <section>
-            <h3>DISCLAIMER</h3>
-            <p>Optional is NOT serializable. It can't be used in remote Session Beans! Ideally use it only on local methods.</p>
+            <h3>DISCLAIMER!</h3>
+            <p>Optional is NOT serializable. It can not be used in remote Session Beans! Use it only on local methods.</p>
         </section>
         <section>
-            <h3>Computations that might fail</h3>
-            <p>This class doesn't exist in Java (currently). It can be found for example in the <a href="javaslang.io" target="_blank">javaslang</a> library. The Try object represents a computation that might complete or fail with an exception.</p>
+            <h3>Try</h3>
+            <p>This class doesn't exist in Java (currently). It can be found, for example, in the <a href="javaslang.io" target="_blank">javaslang</a> library. The Try object represents a computation that might complete or fail with an exception.</p>
         </section>
         <section>
-            <h3>Some Example Try</h3>
+            <h3>Try</h3>
+            <p>Possible Implementation</p>
             <pre><code>interface Try&lt;T&gt; {
     //Consumes the throwable if this is a Failure.
     Try&lt;T&gt; onFailure(Consumer&lt;? super Throwable&gt; action);
@@ -413,7 +414,8 @@ public class ReaderWs {
 }</code></pre>
         </section>
         <section>
-            <h3>Example Code</h3>
+            <h3>Try</h3>
+            <p>Example code</p>
             <pre><code>Try&lt;String&gt; attempt = getURL("https://devnull-as-a-service.com/");
 attempt.onFailure(e -> logger.log(Level.SEVERE, "Error occurred", e))
        .onSuccess(logger::info)
@@ -438,10 +440,16 @@ Try&lt;String&gt; getURL(String url) {
         </section>
         <section>
             <h2>Decouple services</h2>
-            <p>Provide loosely coupled communications between services while keeping guarantees of delivery and fault tolerance.</p>
+            <p>Provide loosely coupled communications between services while keeping certain degree of guarantees of delivery and fault tolerance.</p>
         </section>
         <section>
             <h3>JMS</h3>
+            <p>The oldest of the API's introduced in this talk. It is loosely coupled, transactional and it can be durable, fault tolerant and clustered.</p>
+        </section>
+        <section>
+            <h3>JMS</h3>
+            <p>Producer</p>
+            <pre><code></code></pre>
         </section>
         <section>
             <h3>CDI Events</h3>
