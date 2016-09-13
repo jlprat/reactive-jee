@@ -18,6 +18,7 @@ import java.util.List;
  * @author jpra
  *         copyright (c) 2003-2016 GameDuell GmbH, All Rights Reserved
  */
+@Stateless
 @Path("/lending")
 public class LendingDeskWs {
 

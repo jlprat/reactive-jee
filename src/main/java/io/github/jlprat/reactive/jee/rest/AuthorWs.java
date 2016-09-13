@@ -13,6 +13,7 @@ import javax.ws.rs.core.Response;
 /**
  * @author @jlprat
  */
+@Stateless
 @Path("/users/authors")
 public class AuthorWs {
 

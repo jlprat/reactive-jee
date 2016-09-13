@@ -14,16 +14,19 @@ import java.util.logging.Logger;
 /**
  * @author @jlprat
  */
+@Stateless
 @Path("/users/readers")
 public class ReaderWs {
 
-    Logger logger = Logger.getLogger(ReaderWs.class.getName());
+    private static Logger logger = Logger.getLogger(ReaderWs.class.getName());
 
     @Inject
     private ReaderService readerService;
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getReaders() {
+        logger.info("Processing request " + Thread.currentThread().getName());
         return Response.ok(readerService.getReaders()).build();
     }
 

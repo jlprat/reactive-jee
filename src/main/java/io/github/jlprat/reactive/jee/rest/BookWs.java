@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
  * It returns all users in system, authors and readers
  * @author @jlprat
  */
+@Stateless
 @Path("/books")
 public class BookWs {
 
