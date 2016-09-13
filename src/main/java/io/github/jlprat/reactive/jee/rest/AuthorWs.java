@@ -42,7 +42,7 @@ public class AuthorWs {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createAuthor(@FormParam("name") final String name, @FormParam("surname") final String surname) {
-        final Author reader = authorService.createAuthor(name, surname);
-        return Response.ok(reader).build();
+        final Author author = authorService.createAuthor(name, surname);
+        return Response.ok(author).build();
     }
 }
