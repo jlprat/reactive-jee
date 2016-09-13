@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 @Stateless
 public class BookService {
 
-    private Logger logger = Logger.getLogger(BookService.class.getName());
+    private static final Logger logger = Logger.getLogger(BookService.class.getName());
 
     @PersistenceContext
     private EntityManager em;
