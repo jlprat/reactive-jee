@@ -3,15 +3,15 @@ package io.github.jlprat.reactive.jee.rest;
 import io.github.jlprat.reactive.jee.domain.Author;
 import io.github.jlprat.reactive.jee.service.AuthorService;
 
+import javax.ejb.Asynchronous;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.*;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,15 +47,11 @@ public class AuthorWs {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createAuthor(@FormParam("name") final String name, @FormParam("surname") final String surname) {
-        final Future<Author> authorFuture = authorService.createAuthor(name, surname);
-        try {
-            final Author author = authorFuture.get(2, TimeUnit.SECONDS);
-            return Response.ok(author).build();
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            logger.log(Level.SEVERE, "Error processing the future", e);
-            return Response.serverError().build();
-        }
-
+    @Asynchronous
+    public void createAuthor(@FormParam("name") final String name, @FormParam("surname") final String surname,
+                             @Suspended AsyncResponse response) {
+        CompletableFuture<Author> futureAuthor = new CompletableFuture<>();
+        authorService.createAuthor(name, surname, futureAuthor);
+        futureAuthor.thenApply(response::resume);
     }
 }
