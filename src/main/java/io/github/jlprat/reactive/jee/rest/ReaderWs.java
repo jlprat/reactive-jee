@@ -23,12 +23,14 @@ public class ReaderWs {
     private ReaderService readerService;
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getReaders() {
         return Response.ok(readerService.getReaders()).build();
     }
 
     @Path("/{id}")
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getReader(@PathParam("id") final String id) {
         final Reader reader = readerService.getReader(id);
         if (reader != null) {

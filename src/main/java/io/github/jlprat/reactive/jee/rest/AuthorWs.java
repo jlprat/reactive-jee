@@ -21,12 +21,14 @@ public class AuthorWs {
     private AuthorService authorService;
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getAuthors() {
         return Response.ok(authorService.getAuthors()).build();
     }
 
     @Path("/{id}")
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getAuthor(@PathParam("id") final String id) {
         final Author author = authorService.getAuthor(id);
         if (author != null) {
