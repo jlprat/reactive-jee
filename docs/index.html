@@ -87,6 +87,10 @@
             <h2>Reactive JEE</h2>
         </section>
         <section>
+            <p>Code for this talk under <a href="https://github.com/jlprat/reactive-jee" target="_blank">https://github.com/jlprat/reactive-jee</a></p>
+            <img src="images/talkLink.png" alt="https://github.com/jlprat/reactive-jee">
+        </section>
+        <section>
             <h2>3 main areas</h2>
             <ul>
                 <li class="fragment">Asynchronicity</li>
@@ -177,13 +181,153 @@ public class UserWs {
     }
 }</code></pre>
         </section>
-
-
+        <section>
+            <h3>Asynchronous JAX-RS</h3>
+            <p>Never wait forever!</p>
+            <pre><code>@Path("/users")
+public class UserWs {
+    ...
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Asynchronous
+    public void getUsers(@Suspended AsyncResponse response) {
+        response.setTimeout(2, TimeUnit.SECONDS);
+        response.setTimeoutHandler(resp ->
+            resp.resume(Response.status(Status.REQUEST_TIMEOUT).build()));
+        final List&lt;Author&gt; authors = authorService.getAuthors();
+        final List&lt;Reader&gt; readers = readerService.getReaders();
+        final List&lt;Person&gt; users = mergeUsers(authors, readers);
+        response.resume(Response.ok(users).build());
+    }
+}</code></pre>
+        </section>
+        <section>
+            <h3>Behind the Scenes</h3>
+            <p>Request is accepted by a thread belonging to the http-thread-pool but the processing it's handled by a thread from the ejb-thread-pool. This way, the http-thread is free to accept new incoming request.</p>
+        </section>
+        <section>
+            <h3>Behind the Scenes</h3>
+            <p>Last thing you want is waiting forever to complete a request from a client. Always specify timeouts when doing asynchronous tasks.</p>
+        </section>
+        <section>
+            <h3>Asynchronous Servlet and JAX-RS</h3>
+            <p>Use them when you have a combination of heavy and light loaded queries. You can get a higher throughput and your server can be better fine-tuned.</p>
+        </section>
         <section>
             <h3>Asynchronous Session Beans</h3>
+            <p>How a normal one looks like</p>
+            <pre><code>@Stateless
+public class AuthorService {
+    public Author createAuthor(final String name, final String surname) {
+        final Author author = new Author(UUID.randomUUID(), name, surname);
+        em.persist(author);
+        return author;
+    }
+}</code></pre>
+        </section>
+        <section>
+            <h3>Asynchronous Session Beans</h3>
+            <p>Making it asynchronous (I)</p>
+            <pre><code>@Stateless
+public class AuthorService {
+    @Asynchronous
+    public Future&lt;Author&gt; createAuthor(final String name, final String surname) {
+        final Author author = new Author(UUID.randomUUID(), name, surname);
+        em.persist(author);
+        return new AsyncResult&lt;&gt;(author);
+    }
+}</code></pre>
+        </section>
+        <section>
+            <h3>Asynchronous Session Beans</h3>
+            <p>The Client (I)</p>
+            <pre><code>@Path("/users/authors")
+public class AuthorWs {
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createAuthor(@FormParam("name") final String name, @FormParam("surname") final String surname) {
+        final Future&lt;Author&gt; authorFuture =
+                authorService.createAuthor(name, surname);
+        try {
+            final Author author = authorFuture.get(2, TimeUnit.SECONDS);
+            return Response.ok(author).build();
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            return Response.serverError().build();
+        }
+    }
+}</code></pre>
+        </section>
+        <section>
+            <h3>Asynchronous Session Beans</h3>
+            <p>Making it asynchronous (II)</p>
+            <pre><code>@Stateless
+public class AuthorService {
+    @Asynchronous
+    public CompletableFuture&lt;Author&gt; createAuthor(final String name, final String surname) {
+        final Author author = new Author(UUID.randomUUID(), name, surname);
+        em.persist(author);
+        return CompletableFuture.completedFuture(author);
+    }
+}</code></pre>
+        </section>
+        <section>
+            <h3>Asynchronous Session Beans</h3>
+            <p>The Client (II)</p>
+            <pre><code>@Path("/users/authors")
+public class AuthorWs {
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    public void createAuthor(@FormParam("name") final String name, @FormParam("surname") final String surname,
+                                 @Suspended AsyncResponse response) {
+        response.setTimeout(2, TimeUnit.SECONDS);
+        response.setTimeoutHandler(resp -> {
+            resp.resume(Response.status(Response.Status.REQUEST_TIMEOUT).build());
+        });
+        authorService.createAuthor(name, surname).thenApply(response::resume);
+    }
+}</code></pre>
+        </section>
+        <section>
+            <h3>Asynchronous Session Beans</h3>
+            <h3>This does not work!</h3>
+            <blockquote>Async method exposed through no-interface view must  have return type void or java.lang.concurrent.Future&lt;V&gt;</blockquote>
+        </section>
+        <section>
+            <h3>Asynchronous Session Beans</h3>
+            <p>Making it asynchronous (III)</p>
+            <pre><code>@Stateless
+public class AuthorService {
+    @Asynchronous
+    public void createAuthor(final String name, final String surname,
+                final CompletableFuture&lt;Author&gt; future) {
+        final Author author = new Author(UUID.randomUUID(), name, surname);
+        em.persist(author);
+        future.complete(author);
+    }
+}</code></pre>
+        </section>
+        <section>
+            <h3>Asynchronous Session Beans</h3>
+            <p>The Client (III)</p>
+            <pre><code>@Path("/users/authors")
+public class AuthorWs {
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Asynchronous
+    public void createAuthor(@FormParam("name") final String name, @FormParam("surname") final String surname,
+                             @Suspended AsyncResponse response) {
+        CompletableFuture&lt;Author&gt; futureAuthor = new CompletableFuture<>();
+        authorService.createAuthor(name, surname, futureAuthor);
+        futureAuthor.thenApply(response::resume);
+    }
+}</code></pre>
         </section>
         <section>
             <h3>Future vs CompletableFuture</h3>
+
         </section>
         <section>
             <h2>Embrace failure and errors</h2>
