@@ -1,9 +1,12 @@
 package io.github.jlprat.reactive.jee.service;
 
 import io.github.jlprat.reactive.jee.domain.Reader;
+import io.github.jlprat.reactive.jee.event.BookLoan;
+import io.github.jlprat.reactive.jee.event.ReturnedBook;
 
 import javax.ejb.Asynchronous;
 import javax.ejb.Stateless;
+import javax.enterprise.event.Observes;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
@@ -34,6 +37,11 @@ public class ReaderService {
         final Reader reader = new Reader(UUID.randomUUID(), name, surname);
         em.persist(reader);
         return reader;
+    }
+
+    public void updateBookShelf(@Observes @ReturnedBook BookLoan bookLoan) {
+        bookLoan.reader.returnBook(bookLoan.book);
+        em.merge(bookLoan.reader);
     }
 
     /**

@@ -3,13 +3,23 @@ package io.github.jlprat.reactive.jee.service;
 import io.github.jlprat.reactive.jee.domain.Book;
 import io.github.jlprat.reactive.jee.domain.BookAvailability;
 import io.github.jlprat.reactive.jee.domain.Reader;
+import io.github.jlprat.reactive.jee.event.BookLoan;
+import io.github.jlprat.reactive.jee.event.ReturnedBook;
 import io.github.jlprat.reactive.jee.exception.BookNotAvailableException;
 import io.github.jlprat.reactive.jee.exception.BookNotLentException;
 import io.github.jlprat.reactive.jee.exception.ReaderNotInPossesionOfBookException;
 
+import javax.annotation.Resource;
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
+import javax.jms.DeliveryMode;
+import javax.jms.Destination;
+import javax.jms.JMSContext;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -17,25 +27,43 @@ import java.util.logging.Logger;
  */
 public class LendingService {
 
-    Logger logger = Logger.getLogger(LendingService.class.getName());
+    private static final Logger logger = Logger.getLogger(LendingService.class.getName());
 
+    @Inject
+    private JMSContext jmsContext;
+
+    //@Resource(lookup = "jms/BookLendingQueue")
+    //private Destination bookLendingQueue;
 
     @PersistenceContext
     private EntityManager em;
+
+    @Inject
+    @ReturnedBook
+    Event<BookLoan> returnedBook;
+
 
     public BookAvailability lendBook(final Book book, final Reader reader) {
         final BookAvailability bookAvailability = em.find(BookAvailability.class, book.getIsbn());
         if (!bookAvailability.isAvailable()) {
             throw new BookNotAvailableException();
         } else {
+            //sendLoanBookJMS(reader, book);
             reader.loanBook(book);
             bookAvailability.lend();
-
             em.merge(reader);
             em.merge(bookAvailability);
             return bookAvailability;
         }
     }
+
+   /* private void sendLoanBookJMS(Reader reader, Book book) {
+        final Map<String, Object> message = new HashMap<>();
+        message.put("readerId", reader.getId());
+        message.put("bookIsbn", book.getIsbn());
+        jmsContext.createProducer()
+                .send(bookLendingQueue, message);
+    }*/
 
     public BookAvailability publishBook(final Book book) {
         final BookAvailability bookAvailability = new BookAvailability(book.getIsbn());
@@ -49,12 +77,9 @@ public class LendingService {
             throw new BookNotLentException();
         } else {
             if (reader.returnBook(book)) {
+                returnedBook.fire(new BookLoan(book, reader));
                 bookAvailability.returned();
-                logger.info("about to save reader");
-                em.merge(reader);
-                logger.info("about to save book availability");
                 em.merge(bookAvailability);
-                logger.info("all saved");
                 return bookAvailability;
             } else {
                 throw new ReaderNotInPossesionOfBookException();
