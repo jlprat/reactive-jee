@@ -11,6 +11,10 @@
     padding-top: 2em !important;
 }
 
+#gdSlides mark {
+    background-color: rgba(158, 154, 154, 0.28);
+}
+
 #gdSlides .rotation {
     transform: rotate(-5deg);
 }

@@ -108,8 +108,8 @@
         </section>
         <section>
             <h3>Asynchronous Servlet</h3>
-            <p>How a normal one looks like</p>
-            <pre><code>@WebServlet(urlPatterns = "/servlet/users")
+            <p>How a synchronous one looks like</p>
+            <pre><code data-trim data-noescape>@WebServlet(urlPatterns = "/servlet/users")
 public class UserServlet extends HttpServlet {
     ...
     @Override
@@ -129,18 +129,18 @@ public class UserServlet extends HttpServlet {
         <section>
             <h3>Asynchronous Servlet</h3>
             <p>Making it asynchronous</p>
-            <pre><code>@WebServlet(urlPatterns = "/servlet/users", asyncSuppported = true)
+            <pre><code data-trim data-noescape>@WebServlet(urlPatterns = "/servlet/users", <mark>asyncSuppported = true</mark>)
 public class UserServlet extends HttpServlet {
     ...
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        final AsyncContext asyncCtx = req.startAsync();
-        asyncCtx.start(() -> {
+        <mark>final AsyncContext asyncCtx = req.startAsync();</mark>
+        <mark>asyncCtx.start(() -> {</mark>
             final List&lt;Author&gt; authors = authorService.getAuthors();
             final List&lt;Reader&gt; readers = readerService.getReaders();
             final List&lt;Person&gt; users = mergeUsers(authors, readers);
             printUsers(users, asyncCtx.getResponse().getOutputStream());
-            asyncCtx.complete();
+            <mark>asyncCtx.complete();</mark>
         });
     }
 }</code></pre>
@@ -150,8 +150,8 @@ public class UserServlet extends HttpServlet {
         </section>
         <section>
             <h3>Asynchronous JAX-RS</h3>
-            <p>How a normal one looks like</p>
-            <pre><code>@Path("/users")
+            <p>How a synchronous one looks like</p>
+            <pre><code data-trim data-noescape>@Path("/users")
 public class UserResource {
     ...
     @GET
@@ -167,25 +167,25 @@ public class UserResource {
         <section>
             <h3>Asynchronous JAX-RS</h3>
             <p>Making it asynchronous</p>
-            <pre><code>@Stateless
+            <pre><code data-trim data-noescape>@Stateless
 @Path("/users")
 public class UserResource {
     ...
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Asynchronous
-    public void getUsers(@Suspended AsyncResponse response) {
+    <mark>@Asynchronous</mark>
+    public void getUsers(<mark>@Suspended AsyncResponse response</mark>) {
         final List&lt;Author&gt; authors = authorService.getAuthors();
         final List&lt;Reader&gt; readers = readerService.getReaders();
         final List&lt;Person&gt; users = mergeUsers(authors, readers);
-        response.resume(Response.ok(users).build());
+        <mark>response.resume(Response.ok(users).build());</mark>
     }
 }</code></pre>
         </section>
         <section>
             <h3>Asynchronous JAX-RS</h3>
             <p>Never wait forever!</p>
-            <pre><code>@Stateless
+            <pre><code data-trim data-noescape>@Stateless
 @Path("/users")
 public class UserResource {
     ...
@@ -193,9 +193,9 @@ public class UserResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Asynchronous
     public void getUsers(@Suspended AsyncResponse response) {
-        response.setTimeout(2, TimeUnit.SECONDS);
-        response.setTimeoutHandler(resp ->
-            resp.resume(Response.status(Status.REQUEST_TIMEOUT).build()));
+        <mark>response.setTimeout(2, TimeUnit.SECONDS);</mark>
+        <mark>response.setTimeoutHandler(resp -></mark>
+            <mark>resp.resume(Response.status(Status.REQUEST_TIMEOUT).build()));</mark>
         final List&lt;Author&gt; authors = authorService.getAuthors();
         final List&lt;Reader&gt; readers = readerService.getReaders();
         final List&lt;Person&gt; users = mergeUsers(authors, readers);
@@ -217,8 +217,8 @@ public class UserResource {
         </section>
         <section>
             <h3>Asynchronous Session Beans</h3>
-            <p>How a normal one looks like</p>
-            <pre><code>@Stateless
+            <p>How a synchronous one looks like</p>
+            <pre><code data-trim data-noescape>@Stateless
 public class AuthorService {
     public Author createAuthor(final String name, final String surname) {
         final Author author = new Author(UUID.randomUUID(), name, surname);
@@ -230,20 +230,20 @@ public class AuthorService {
         <section>
             <h3>Asynchronous Session Beans</h3>
             <p>Making it asynchronous (I)</p>
-            <pre><code>@Stateless
+            <pre><code data-trim data-noescape>@Stateless
 public class AuthorService {
-    @Asynchronous
-    public Future&lt;Author&gt; createAuthor(final String name, final String surname) {
+    <mark>@Asynchronous</mark>
+    public <mark>Future&lt;Author&gt;</mark> createAuthor(final String name, final String surname) {
         final Author author = new Author(UUID.randomUUID(), name, surname);
         em.persist(author);
-        return new AsyncResult&lt;&gt;(author);
+        return <mark>new AsyncResult&lt;&gt;(author);</mark>
     }
 }</code></pre>
         </section>
         <section>
             <h3>Asynchronous Session Beans</h3>
             <p>The Client (I)</p>
-            <pre><code>@Path("/users/authors")
+            <pre><code data-trim data-noescape>@Path("/users/authors")
 public class AuthorResource {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -252,7 +252,7 @@ public class AuthorResource {
         final Future&lt;Author&gt; authorFuture =
                 authorService.createAuthor(name, surname);
         try {
-            final Author author = authorFuture.get(2, TimeUnit.SECONDS);
+            <mark>final Author author = authorFuture.get(2, TimeUnit.SECONDS);</mark>
             return Response.ok(author).build();
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             return Response.serverError().build();
@@ -263,31 +263,33 @@ public class AuthorResource {
         <section>
             <h3>Asynchronous Session Beans</h3>
             <p>Making it asynchronous (II)</p>
-            <pre><code>@Stateless
+            <pre><code data-trim data-noescape>@Stateless
 public class AuthorService {
     @Asynchronous
-    public CompletableFuture&lt;Author&gt; createAuthor(final String name, final String surname) {
+    public <mark>CompletableFuture&lt;Author&gt;</mark> createAuthor(final String name, final String surname) {
         final Author author = new Author(UUID.randomUUID(), name, surname);
         em.persist(author);
-        return CompletableFuture.completedFuture(author);
+        return <mark>CompletableFuture.completedFuture(author);</mark>
     }
 }</code></pre>
         </section>
         <section>
             <h3>Asynchronous Session Beans</h3>
             <p>The Client (II)</p>
-            <pre><code>@Path("/users/authors")
+            <pre><code data-trim data-noescape>@Stateless
+@Path("/users/authors")
 public class AuthorResource {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
+    @Asynchronous
     public void createAuthor(@FormParam("name") final String name, @FormParam("surname") final String surname,
                                  @Suspended AsyncResponse response) {
         response.setTimeout(2, TimeUnit.SECONDS);
         response.setTimeoutHandler(resp -> {
             resp.resume(Response.status(Response.Status.REQUEST_TIMEOUT).build());
         });
-        authorService.createAuthor(name, surname).thenApply(response::resume);
+        <mark>authorService.createAuthor(name, surname).thenApply(response::resume);</mark>
     }
 }</code></pre>
         </section>
@@ -299,14 +301,14 @@ public class AuthorResource {
         <section>
             <h3>Asynchronous Session Beans</h3>
             <p>Making it asynchronous (III)</p>
-            <pre><code>@Stateless
+            <pre><code data-trim data-noescape>@Stateless
 public class AuthorService {
     @Asynchronous
     public void createAuthor(final String name, final String surname,
-                final CompletableFuture&lt;Author&gt; promise) {
+                final <mark>CompletableFuture&lt;Author&gt; promise</mark>) {
         final Author author = new Author(UUID.randomUUID(), name, surname);
         em.persist(author);
-        promise.complete(author);
+        <mark>promise.complete(author);</mark>
     }
 }</code></pre>
         </section>
@@ -314,7 +316,7 @@ public class AuthorService {
             <section>
                 <h3>Asynchronous Session Beans</h3>
                 <p>The Client (III)</p>
-                <pre><code>@Stateless
+                <pre><code data-trim data-noescape>@Stateless
 @Path("/users/authors")
 public class AuthorResource {
     @POST
@@ -323,16 +325,16 @@ public class AuthorResource {
     @Asynchronous
     public void createAuthor(@FormParam("name") final String name, @FormParam("surname") final String surname,
                              @Suspended AsyncResponse response) {
-        CompletableFuture&lt;Author&gt; futureAuthor = new CompletableFuture<>();
-        authorService.createAuthor(name, surname, futureAuthor);
-        futureAuthor.thenApply(response::resume);
+        <mark>CompletableFuture&lt;Author&gt; promise = new CompletableFuture<>();</mark>
+        authorService.createAuthor(name, surname, promise);
+        <mark>promise.thenApply(response::resume);</mark>
     }
 }</code></pre>
             </section>
             <section>
                 <h3>Asynchronous Session Beans</h3>
                 <p>The Client (III bis)</p>
-                <pre><code>@GET
+                <pre><code data-trim data-noescape>@GET
 @Produces(MediaType.APPLICATION_JSON)
 @Asynchronous
 public void getUsers(@Suspended AsyncResponse response) {
@@ -376,7 +378,7 @@ public void getUsers(@Suspended AsyncResponse response) {
         <section>
             <h3>Optional</h3>
             <p>Example code</p>
-            <pre><code>@Stateless
+            <pre><code data-trim data-noescape>@Stateless
 public class ReaderService {
     public Optional&lt;Reader&gt; getReader(final String id) {
         return Optional.ofNullable(em.find(Reader.class, id));
@@ -405,7 +407,7 @@ public class ReaderResource {
         <section>
             <h3>Try</h3>
             <p>Possible Implementation</p>
-            <pre><code>interface Try&lt;T&gt; {
+            <pre><code data-trim data-noescape>interface Try&lt;T&gt; {
     //Consumes the throwable if this is a Failure.
     Try&lt;T&gt; onFailure(Consumer&lt;? super Throwable&gt; action);
     //Consumes the value if this is a Success.
@@ -417,7 +419,7 @@ public class ReaderResource {
         <section>
             <h3>Try</h3>
             <p>Example code</p>
-            <pre><code>Try&lt;String&gt; attempt = getURL("https://devnull-as-a-service.com/");
+            <pre><code data-trim data-noescape>Try&lt;String&gt; attempt = getURL("https://devnull-as-a-service.com/");
 attempt.onFailure(e -> logger.log(Level.SEVERE, "Error occurred", e))
        .onSuccess(logger::info);
 Try&lt;String&gt; getURL(String url) {
@@ -450,7 +452,7 @@ Try&lt;String&gt; getURL(String url) {
         <section>
             <h3>JMS</h3>
             <p>Coupled code</p>
-            <pre><code>public class LendingService {
+            <pre><code data-trim data-noescape>public class LendingService {
     public BookAvailability lendBook(final Book book, final Reader reader) {
         final BookAvailability bookAvailability =
                 em.find(BookAvailability.class, book.getIsbn());
@@ -469,12 +471,12 @@ Try&lt;String&gt; getURL(String url) {
         <section>
             <h3>JMS</h3>
             <p>The Producer</p>
-            <pre><code>public class LendingService {
-    @Inject JMSContext jmsContext;
-    @Resource(lookup = "jms/BookLendingQueue") Destination queue;
+            <pre><code data-trim data-noescape>public class LendingService {
+    <mark>@Inject JMSContext jmsContext;</mark>
+    <mark>@Resource(lookup = "jms/BookLendingQueue") Destination queue;</mark>
     public BookAvailability lendBook(Book book, Reader reader) {
         ...
-        sendLoanBookJMS(reader, book);
+        <mark>sendLoanBookJMS(reader, book);</mark>
         bookAvailability.lend();
         em.merge(bookAvailability);
         ...
@@ -483,14 +485,14 @@ Try&lt;String&gt; getURL(String url) {
         final Map&lt;String, Object&gt; message = new HashMap&lt;&gt;();
         message.put("readerId", reader.getId());
         message.put("bookIsbn", book.getIsbn());
-        jmsContext.createProducer().send(queue, message);
+        <mark>jmsContext.createProducer().send(queue, message);</mark>
     }
 }</code></pre>
         </section>
         <section>
             <h3>JMS</h3>
             <p>The Consumer</p>
-            <pre><code>@MessageDriven(activationConfig = {
+            <pre><code data-trim data-noescape>@MessageDriven(activationConfig = {
         @ActivationConfigProperty(propertyName = "destinationType",
                 propertyValue = "javax.jms.Queue"),
         @ActivationConfigProperty(propertyName = "destinationLookup",
@@ -518,14 +520,14 @@ public class ReaderMDB implements MessageListener {
         <section>
             <h3>CDI Events</h3>
             <p>Producer</p>
-            <pre><code>public class LendingService {
-    @Inject @ReturnedBook Event&lt;BookLoan&gt; returnedBook;
+            <pre><code data-trim data-noescape>public class LendingService {
+    <mark>@Inject @ReturnedBook Event&lt;BookLoan&gt; returnedBook;</mark>
     public BookAvailability returnBook(final Book book, final Reader reader) {
         ...
         if (reader.getBookShelf().contains(book)) {
             bookAvailability.returned();
             em.merge(bookAvailability);
-            returnedBook.fire(new BookLoan(book, reader));
+            <mark>returnedBook.fire(new BookLoan(book, reader));</mark>
             return bookAvailability;
         }
         ...
@@ -536,7 +538,7 @@ public class ReaderMDB implements MessageListener {
             <section>
                 <h3>CDI Events</h3>
                 <p>Consumer</p>
-                <pre><code>@Stateless
+                <pre><code data-trim data-noescape>@Stateless
 public class ReaderService {
     public void updateBookShelf(@Observes @ReturnedBook BookLoan bookLoan) {
         bookLoan.reader.returnBook(bookLoan.book);
@@ -547,9 +549,9 @@ public class ReaderService {
             <section>
                 <h3>CDI Events</h3>
                 <p>Asynchronous Consumer</p>
-                <pre><code>@Stateless
+                <pre><code data-trim data-noescape>@Stateless
 public class ReaderService {
-    @Asynchronous
+    <mark>@Asynchronous</mark>
     public void updateBookShelf(@Observes @ReturnedBook BookLoan bookLoan) {
         bookLoan.reader.returnBook(bookLoan.book);
         em.merge(bookLoan.reader);
