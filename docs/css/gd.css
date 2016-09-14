@@ -11,6 +11,10 @@
     padding-top: 2em !important;
 }
 
+#gdSlides .rotation {
+    transform: rotate(-5deg);
+}
+
 #gdSlides .logo {
     background-image: url('../images/retina_GameDuell_logo.png');
     background-size: cover;
@@ -26,6 +30,8 @@
     position: absolute;
     left: 10%;
     top: 0;
+    z-index: 10;
+    cursor: pointer;
 }
 
 #gdSlides .stacked {
