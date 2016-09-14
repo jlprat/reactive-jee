@@ -29,9 +29,9 @@ import java.util.logging.Logger;
  */
 @Stateless
 @Path("/users")
-public class UserWs {
+public class UserResource {
 
-    private static Logger logger = Logger.getLogger(UserWs.class.getName());
+    private static Logger logger = Logger.getLogger(UserResource.class.getName());
 
     @Inject
     private AuthorService authorService;

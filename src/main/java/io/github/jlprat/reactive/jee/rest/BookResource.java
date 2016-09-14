@@ -20,7 +20,7 @@ import java.util.Optional;
  */
 @Stateless
 @Path("/books")
-public class BookWs {
+public class BookResource {
 
     @Inject
     private BookService bookService;

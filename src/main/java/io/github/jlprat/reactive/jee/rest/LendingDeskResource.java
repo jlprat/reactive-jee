@@ -20,7 +20,7 @@ import java.util.Optional;
  */
 @Stateless
 @Path("/lending")
-public class LendingDeskWs {
+public class LendingDeskResource {
 
     @Inject
     private ReaderService readerService;

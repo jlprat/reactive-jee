@@ -21,9 +21,9 @@ import java.util.logging.Logger;
  */
 @Stateless
 @Path("/users/authors")
-public class AuthorWs {
+public class AuthorResource {
 
-    private static final Logger logger = Logger.getLogger(AuthorWs.class.getName());
+    private static final Logger logger = Logger.getLogger(AuthorResource.class.getName());
 
 
     @Inject

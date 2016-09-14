@@ -21,9 +21,9 @@ import java.util.logging.Logger;
  */
 @Stateless
 @Path("/users/readers")
-public class ReaderWs {
+public class ReaderResource {
 
-    private static Logger logger = Logger.getLogger(ReaderWs.class.getName());
+    private static Logger logger = Logger.getLogger(ReaderResource.class.getName());
 
     @Inject
     private ReaderService readerService;
