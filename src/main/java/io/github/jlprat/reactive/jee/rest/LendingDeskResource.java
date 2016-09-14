@@ -19,7 +19,7 @@ import java.util.List;
  */
 @Stateless
 @Path("/lending")
-public class LendingDeskWs {
+public class LendingDeskResource {
 
     @Inject
     private ReaderService readerService;

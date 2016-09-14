@@ -3,21 +3,19 @@ package io.github.jlprat.reactive.jee.rest;
 import io.github.jlprat.reactive.jee.domain.Reader;
 import io.github.jlprat.reactive.jee.service.ReaderService;
 
-import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
  * @author @jlprat
  */
 @Path("/users/readers")
-public class ReaderWs {
+public class ReaderResource {
 
-    Logger logger = Logger.getLogger(ReaderWs.class.getName());
+    Logger logger = Logger.getLogger(ReaderResource.class.getName());
 
     @Inject
     private ReaderService readerService;

@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
  */
 @Stateless
 @Path("/users/authors")
-public class AuthorWs {
+public class AuthorResource {
 
     @Inject
     private AuthorService authorService;

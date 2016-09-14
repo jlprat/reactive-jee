@@ -23,7 +23,7 @@ import java.util.List;
  */
 @Stateless
 @Path("/users")
-public class UserWs {
+public class UserResource {
 
     @Inject
     private AuthorService authorService;

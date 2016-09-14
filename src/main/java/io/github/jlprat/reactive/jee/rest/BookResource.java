@@ -19,7 +19,7 @@ import javax.ws.rs.core.Response;
  */
 @Stateless
 @Path("/books")
-public class BookWs {
+public class BookResource {
 
     @Inject
     private BookService bookService;
