@@ -152,7 +152,7 @@ public class UserServlet extends HttpServlet {
             <h3>Asynchronous JAX-RS</h3>
             <p>How a normal one looks like</p>
             <pre><code>@Path("/users")
-public class UserWs {
+public class UserResource {
     ...
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -169,7 +169,7 @@ public class UserWs {
             <p>Making it asynchronous</p>
             <pre><code>@Stateless
 @Path("/users")
-public class UserWs {
+public class UserResource {
     ...
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -187,7 +187,7 @@ public class UserWs {
             <p>Never wait forever!</p>
             <pre><code>@Stateless
 @Path("/users")
-public class UserWs {
+public class UserResource {
     ...
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -244,7 +244,7 @@ public class AuthorService {
             <h3>Asynchronous Session Beans</h3>
             <p>The Client (I)</p>
             <pre><code>@Path("/users/authors")
-public class AuthorWs {
+public class AuthorResource {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -277,7 +277,7 @@ public class AuthorService {
             <h3>Asynchronous Session Beans</h3>
             <p>The Client (II)</p>
             <pre><code>@Path("/users/authors")
-public class AuthorWs {
+public class AuthorResource {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -316,7 +316,7 @@ public class AuthorService {
                 <p>The Client (III)</p>
                 <pre><code>@Stateless
 @Path("/users/authors")
-public class AuthorWs {
+public class AuthorResource {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -366,7 +366,7 @@ public void getUsers(@Suspended AsyncResponse response) {
             <img src="images/glass-602889_1280.jpg" alt="broken" width="60%">
         </section>
         <section>
-            <h2>Model failure</h2>
+            <h3>Model failure</h3>
             <p>If things can go wrong, model failure in your API's. In the same way, do not expect users of your methods to check if your returned object is null.</p>
         </section>
         <section>
@@ -384,7 +384,7 @@ public class ReaderService {
 }
 ...
 @Path("/users/readers")
-public class ReaderWs {
+public class ReaderResource {
     public Response getReader(@PathParam("id") final String id) {
         final Optional&lt;Reader&gt; reader = readerService.getReader(id);
         return reader
@@ -419,7 +419,7 @@ public class ReaderWs {
             <p>Example code</p>
             <pre><code>Try&lt;String&gt; attempt = getURL("https://devnull-as-a-service.com/");
 attempt.onFailure(e -> logger.log(Level.SEVERE, "Error occurred", e))
-       .onSuccess(logger::info)
+       .onSuccess(logger::info);
 Try&lt;String&gt; getURL(String url) {
     Try.of(() -> {
         StringBuilder result = new StringBuilder();
@@ -440,7 +440,7 @@ Try&lt;String&gt; getURL(String url) {
             <img src="images/sea-1377712_1280.jpg" alt="messaging" width="60%">
         </section>
         <section>
-            <h2>Decouple services</h2>
+            <h3>Decouple services</h3>
             <p>Provide loosely coupled communications between services while keeping certain degree of guarantees of delivery and fault tolerance.</p>
         </section>
         <section>
