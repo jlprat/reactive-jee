@@ -6,10 +6,10 @@ Code and Slides for "Improving Your JEE Monolith with Reactive Techniques" talk
 
 
 ## To Start
+* asadmin create-jms-resource --restype javax.jms.Queue --property imqDestinationName=jms_BookLendingQueue jms/BookLendingQueue
 * asadmin start-database
 * mvn package
 * asadmin deploy --name library --contextroot library target/reactive-jee-1.0-SNAPSHOT.jar
 
-## Glassifhs issues
-* Jackson Jars are buggy - copy the latest ones under $GLASSFISH_HOME/glassfish/modules
+## Glassfish issues
 * EclipseLink Moxy is buggy - copy the latest one under $GLASSFISH_HOME/glassfish/modules
