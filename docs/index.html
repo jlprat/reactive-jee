@@ -93,13 +93,13 @@
         <section>
             <h2>3 main areas</h2>
             <ol>
-                <li class="fragment">Asynchronicity</li>
-                <li class="fragment">Things fail</li>
-                <li class="fragment">Event based</li>
+                <li class="fragment">Process Asynchronously</li>
+                <li class="fragment">Embrace Failure</li>
+                <li class="fragment">Decouple via Events</li>
             </ol>
         </section>
         <section>
-            <h2>1. Asynchronicity</h2>
+            <h2>1. Process Asynchronously</h2>
             <img src="images/yarn-671956_1280.jpg" alt="threads" width="60%">
         </section>
         <section>
@@ -293,6 +293,7 @@ public class AuthorWs {
         </section>
         <section>
             <h3>This does not work!</h3>
+            <p>JEE specification doesn't allow this.</p>
             <blockquote>Async method exposed through no-interface view must  have return type void or java.lang.concurrent.Future&lt;V&gt;</blockquote>
         </section>
         <section>
@@ -361,7 +362,7 @@ public void getUsers(@Suspended AsyncResponse response) {
             <p>Futures are currently the main actor for Asynchronicity in JEE. However, they have some limitations as they can not compose and make use of the new lambdas like CompletableFuture does.</p>
         </section>
         <section>
-            <h2>2. Things fail</h2>
+            <h2>2. Embrace Failure</h2>
             <img src="images/glass-602889_1280.jpg" alt="broken" width="60%">
         </section>
         <section>
@@ -435,7 +436,7 @@ Try&lt;String&gt; getURL(String url) {
 }</code></pre>
         </section>
         <section>
-            <h2>3. Event Based</h2>
+            <h2>3. Decouple via Events</h2>
             <img src="images/sea-1377712_1280.jpg" alt="messaging" width="60%">
         </section>
         <section>
@@ -444,7 +445,7 @@ Try&lt;String&gt; getURL(String url) {
         </section>
         <section>
             <h3>JMS</h3>
-            <p>The oldest of the API's introduced in this talk. It is loosely coupled, transactional and it can be durable, fault tolerant and clustered. Messages can be ObjectMessage, MapMessage, TextMessage, StreamMessage or BytesMessage.</p>
+            <p>The oldest of the API's introduced in this talk (2001). It is loosely coupled, transactional and it can be durable, fault tolerant and clustered. Messages can be ObjectMessage, MapMessage, TextMessage, StreamMessage or BytesMessage.</p>
         </section>
         <section>
             <h3>JMS</h3>
