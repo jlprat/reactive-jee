@@ -18,12 +18,12 @@ import java.util.logging.Logger;
 /**
  * Created by @jlprat
  */
-/*
+
 @MessageDriven(activationConfig = {
         @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
         @ActivationConfigProperty(propertyName = "destinationLookup", propertyValue = "jms/BookLendingQueue")
 })
-@Stateless*/
+@Stateless
 public class ReaderMDB implements MessageListener {
 
     private static final Logger logger = Logger.getLogger(ReaderMDB.class.getName());
@@ -33,6 +33,7 @@ public class ReaderMDB implements MessageListener {
 
     @Override
     public void onMessage(Message message) {
+        logger.info("received message!");
         final MapMessage msg = (MapMessage) message;
         try {
             Reader reader = em.find(Reader.class, msg.getString("readerId"));

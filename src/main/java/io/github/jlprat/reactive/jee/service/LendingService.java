@@ -32,8 +32,8 @@ public class LendingService {
     @Inject
     private JMSContext jmsContext;
 
-    //@Resource(lookup = "jms/BookLendingQueue")
-    //private Destination bookLendingQueue;
+    @Resource(lookup = "jms/BookLendingQueue")
+    private Destination bookLendingQueue;
 
     @PersistenceContext
     private EntityManager em;
@@ -48,22 +48,21 @@ public class LendingService {
         if (!bookAvailability.isAvailable()) {
             throw new BookNotAvailableException();
         } else {
-            //sendLoanBookJMS(reader, book);
-            reader.loanBook(book);
+            sendLoanBookJMS(reader, book);
             bookAvailability.lend();
-            em.merge(reader);
             em.merge(bookAvailability);
             return bookAvailability;
         }
     }
 
-   /* private void sendLoanBookJMS(Reader reader, Book book) {
+    private void sendLoanBookJMS(Reader reader, Book book) {
         final Map<String, Object> message = new HashMap<>();
         message.put("readerId", reader.getId());
         message.put("bookIsbn", book.getIsbn());
         jmsContext.createProducer()
                 .send(bookLendingQueue, message);
-    }*/
+        logger.info("sent message!");
+    }
 
     public BookAvailability publishBook(final Book book) {
         final BookAvailability bookAvailability = new BookAvailability(book.getIsbn());
