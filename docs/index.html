@@ -444,15 +444,143 @@ Try&lt;String&gt; getURL(String url) {
         </section>
         <section>
             <h3>JMS</h3>
-            <p>The oldest of the API's introduced in this talk. It is loosely coupled, transactional and it can be durable, fault tolerant and clustered.</p>
+            <p>The oldest of the API's introduced in this talk. It is loosely coupled, transactional and it can be durable, fault tolerant and clustered. Messages can be ObjectMessage, MapMessage, TextMessage, StreamMessage or BytesMessage.</p>
         </section>
         <section>
             <h3>JMS</h3>
-            <p>Producer</p>
-            <pre><code></code></pre>
+            <p>Coupled code</p>
+            <pre><code>public class LendingService {
+    public BookAvailability lendBook(final Book book, final Reader reader) {
+        final BookAvailability bookAvailability =
+                em.find(BookAvailability.class, book.getIsbn());
+        if (!bookAvailability.isAvailable()) {
+            throw new BookNotAvailableException();
+        } else {
+            reader.loanBook(book);
+            bookAvailability.lend();
+            em.merge(reader);
+            em.merge(bookAvailability);
+            return bookAvailability;
+        }
+    }
+}</code></pre>
+        </section>
+        <section>
+            <h3>JMS</h3>
+            <p>The Producer</p>
+            <pre><code>public class LendingService {
+    @Inject JMSContext jmsContext;
+    @Resource(lookup = "jms/BookLendingQueue") Destination queue;
+    public BookAvailability lendBook(Book book, Reader reader) {
+        ...
+        sendLoanBookJMS(reader, book);
+        bookAvailability.lend();
+        em.merge(bookAvailability);
+        ...
+    }
+    private void sendLoanBookJMS(Reader reader, Book book) {
+        final Map&lt;String, Object&gt; message = new HashMap&lt;&gt;();
+        message.put("readerId", reader.getId());
+        message.put("bookIsbn", book.getIsbn());
+        jmsContext.createProducer().send(queue, message);
+    }
+}</code></pre>
+        </section>
+        <section>
+            <h3>JMS</h3>
+            <p>The Consumer</p>
+            <pre><code>@MessageDriven(activationConfig = {
+        @ActivationConfigProperty(propertyName = "destinationType",
+                propertyValue = "javax.jms.Queue"),
+        @ActivationConfigProperty(propertyName = "destinationLookup",
+                propertyValue = "jms/BookLendingQueue")})
+@Stateless
+public class ReaderMDB implements MessageListener {
+    ...
+    public void onMessage(Message message) {
+        MapMessage msg = (MapMessage) message;
+        Reader reader = em.find(Reader.class, msg.getString("readerId"));
+        Book book = em.find(Book.class, msg.getString("bookIsbn"));
+        reader.loanBook(book);
+        em.merge(reader);
+    }
+}</code></pre>
+        </section>
+        <section>
+            <h3>JMS</h3>
+            <p>Use JMS when you want to decouple services from each other. The processing of the message will be done in asynchronous fashion. You can add delivery guarantees, or even send messages to other machines. Also useful when you want to broadcast some information.</p>
         </section>
         <section>
             <h3>CDI Events</h3>
+            <p>CDI events are around since JEE 6. They allow beans to communicate without any compile-time dependency. By default events are processed in a synchronous way.</p>
+        </section>
+        <section>
+            <h3>CDI Events</h3>
+            <p>Producer</p>
+            <pre><code>public class LendingService {
+    @Inject @ReturnedBook Event&lt;BookLoan&gt; returnedBook;
+    public BookAvailability returnBook(final Book book, final Reader reader) {
+        ...
+        if (reader.getBookShelf().contains(book)) {
+            bookAvailability.returned();
+            em.merge(bookAvailability);
+            returnedBook.fire(new BookLoan(book, reader));
+            return bookAvailability;
+        }
+        ...
+    }
+}</code></pre>
+        </section>
+        <section>
+            <section>
+                <h3>CDI Events</h3>
+                <p>Consumer</p>
+                <pre><code>@Stateless
+public class ReaderService {
+    public void updateBookShelf(@Observes @ReturnedBook BookLoan bookLoan) {
+        bookLoan.reader.returnBook(bookLoan.book);
+        em.merge(bookLoan.reader);
+    }
+}</code></pre>
+            </section>
+            <section>
+                <h3>CDI Events</h3>
+                <p>Asynchronous Consumer</p>
+                <pre><code>@Stateless
+public class ReaderService {
+    @Asynchronous
+    public void updateBookShelf(@Observes @ReturnedBook BookLoan bookLoan) {
+        bookLoan.reader.returnBook(bookLoan.book);
+        em.merge(bookLoan.reader);
+    }
+}</code></pre>
+            </section>
+        </section>
+        <section>
+            <h3>CDI Events</h3>
+            <p>Producing and consuming CDI events is easier than the JMS way, but it comes with some limitations. If you need asynchronously process the events, it needs to be done manually and thread-safety needs to be taken into account.</p>
+        </section>
+        <section>
+            <h2>Wrap Up</h2>
+            <ul>
+                <li>Use asynchronous methods when the computation is long lasting</li>
+                <li>Help callers with expressive types</li>
+                <li>Use CDI Events or JMS to decouple your services</li>
+            </ul>
+        </section>
+        <section>
+            <h2><a target="_blank" href="https://twitter.com/hashtag/reactivejee">#reactiveJEE</a></h2>
+            <img src="images/talkLink.png" alt="https://github.com/jlprat/reactive-jee">
+            <p class="author">
+                <small>Josep Prat - <a target="_blank" href="https://twitter.com/jlprat">@jlprat</a> - Berlin Expert
+                    Days - 16/09/2016
+                </small>
+            </p>
+        </section>
+        <section>
+            <h2>Further Information</h2>
+            <div><a href="http://inside.gameduell.com/">inside.gameduell.com</a></div>
+            <div><a href="http://www.techtalk-berlin.de/">www.techtalk-berlin.de</a></div>
         </section>
     </div>
 </div>
