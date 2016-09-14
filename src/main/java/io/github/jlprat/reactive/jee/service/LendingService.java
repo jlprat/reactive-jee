@@ -75,7 +75,8 @@ public class LendingService {
         if (bookAvailability.isAvailable()) {
             throw new BookNotLentException();
         } else {
-            if (reader.returnBook(book)) {
+            if (reader.getBookShelf().contains(book)) {
+                logger.info("CDI Event producer - " + Thread.currentThread().getName());
                 returnedBook.fire(new BookLoan(book, reader));
                 bookAvailability.returned();
                 em.merge(bookAvailability);

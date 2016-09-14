@@ -9,17 +9,19 @@ import javax.ejb.Stateless;
 import javax.enterprise.event.Observes;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
 
 /**
  * @author @jlprat
  */
 @Stateless
 public class ReaderService {
+
+    private static final Logger logger = Logger.getLogger(ReaderService.class.getName());
 
     @PersistenceContext
     private EntityManager em;
@@ -39,7 +41,12 @@ public class ReaderService {
         return reader;
     }
 
+    /**
+     * Making this method asynchronous is enabling it to be called concurrently by different events.
+     */
+    @Asynchronous
     public void updateBookShelf(@Observes @ReturnedBook BookLoan bookLoan) {
+        logger.info("CDI Event consumer - " + Thread.currentThread().getName());
         bookLoan.reader.returnBook(bookLoan.book);
         em.merge(bookLoan.reader);
     }
