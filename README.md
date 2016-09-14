@@ -5,7 +5,7 @@ Code and Slides for "Improving Your JEE Monolith with Reactive Techniques" talk
 [https://jlprat.github.io/reactive-jee](https://jlprat.github.io/reactive-jee)
 
 ## Notice the branch
-This repo has a branch named reactive where the same code is written using some of the techniques explained in the slides.
+This repo has a branch named [reactive](https://github.com/jlprat/reactive-jee/tree/reactive) where the same code is written using some of the techniques explained in the slides.
 
 ## To Start
 * asadmin create-jms-resource --restype javax.jms.Queue --property imqDestinationName=jms_BookLendingQueue jms/BookLendingQueue
