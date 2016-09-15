@@ -12,7 +12,17 @@
 }
 
 #gdSlides mark {
-    background-color: rgba(158, 154, 154, 0.28);
+    background-color: white;
+    color: black;
+}
+
+#gdSlides mark .hljs-meta,
+#gdSlides mark .hljs-keyword,
+#gdSlides mark .hljs-literal,
+#gdSlides mark .hljs-type,
+#gdSlides mark .hljs-number,
+#gdSlides mark .hljs-string {
+    color: black;
 }
 
 #gdSlides .rotation {
