@@ -10,9 +10,9 @@ import io.github.jlprat.reactive.jee.exception.BookNotLentException;
 import io.github.jlprat.reactive.jee.exception.ReaderNotInPossesionOfBookException;
 
 import javax.annotation.Resource;
+import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
-import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSContext;
 import javax.persistence.EntityManager;
@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 /**
  * @author @jlprat
  */
+@Stateless
 public class LendingService {
 
     private static final Logger logger = Logger.getLogger(LendingService.class.getName());

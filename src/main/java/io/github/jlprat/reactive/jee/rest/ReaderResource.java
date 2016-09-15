@@ -51,10 +51,9 @@ public class ReaderResource {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createReader(@FormParam("name") final String name, @FormParam("surname") final String surname) {
-        logger.info("name " + name);
-        final Reader reader = readerService.createReader(name, surname);
-        logger.info("reader " + reader);
-        return Response.ok(reader).build();
+    @Asynchronous
+    public void createReader(@FormParam("name") final String name, @FormParam("surname") final String surname,
+                             @Suspended AsyncResponse response) {
+        readerService.createReader(name, surname, response::resume);
     }
 }

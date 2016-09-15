@@ -11,7 +11,11 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Rest end point for users.
@@ -34,7 +38,13 @@ public class BookResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getBooks() {
-        return Response.ok(bookService.getBooks()).build();
+        List<Book> books = null;
+        try {
+            books = bookService.getBooks().get(2, TimeUnit.SECONDS);
+            return Response.ok(books).build();
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            return Response.status(Response.Status.REQUEST_TIMEOUT).build();
+        }
     }
 
     @Path("/{isbn}")

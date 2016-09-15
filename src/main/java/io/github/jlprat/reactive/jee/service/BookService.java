@@ -3,6 +3,8 @@ package io.github.jlprat.reactive.jee.service;
 import io.github.jlprat.reactive.jee.domain.Author;
 import io.github.jlprat.reactive.jee.domain.Book;
 
+import javax.ejb.AsyncResult;
+import javax.ejb.Asynchronous;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -10,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
 /**
@@ -23,8 +26,9 @@ public class BookService {
     @PersistenceContext
     private EntityManager em;
 
-    public List<Book> getBooks() {
-        return em.createNamedQuery(Book.ALL_BOOKS, Book.class).getResultList();
+    @Asynchronous
+    public Future<List<Book>> getBooks() {
+        return new AsyncResult<>(em.createNamedQuery(Book.ALL_BOOKS, Book.class).getResultList());
     }
 
     public Optional<Book> getBook(final String isbn) {

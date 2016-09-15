@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
@@ -35,10 +36,11 @@ public class ReaderService {
         promise.complete(em.createNamedQuery(Reader.ALL_READERS, Reader.class).getResultList());
     }
 
-    public Reader createReader(final String name, final String surname) {
+    @Asynchronous
+    public void createReader(final String name, final String surname, final Consumer<Reader> callback) {
         final Reader reader = new Reader(UUID.randomUUID(), name, surname);
         em.persist(reader);
-        return reader;
+        callback.accept(reader);
     }
 
     /**
