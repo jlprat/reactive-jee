@@ -535,6 +535,15 @@ public class ReaderMDB implements MessageListener {
 }</code></pre>
         </section>
         <section>
+                <h3>CDI Events</h3>
+                <p>Qualifier</p>
+                <pre><code data-trim data-noescape>@Qualifier
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.PARAMETER})
+public @interface ReturnedBook {
+}</code></pre>
+        </section>
+        <section>
             <section>
                 <h3>CDI Events</h3>
                 <p>Consumer</p>
