@@ -423,7 +423,7 @@ public class ReaderResource {
 attempt.onFailure(e -> logger.log(Level.SEVERE, "Error occurred", e))
        .onSuccess(logger::info);
 Try&lt;String&gt; getURL(String url) {
-    Try.of(() -> {
+    return Try.of(() -> {
         StringBuilder result = new StringBuilder();
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
         conn.setRequestMethod("GET");
